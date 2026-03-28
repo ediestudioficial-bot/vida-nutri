@@ -1,0 +1,20 @@
+{
+  "name": "vida-nutri",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node src/web-server.ts",
+    "ai:menu": "ts-node src/cli.ts",
+    "test": "ts-node tests/run-tests.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
+  }
+}
