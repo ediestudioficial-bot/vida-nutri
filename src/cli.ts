@@ -1,3 +1,4 @@
+require("dotenv").config();
 import { generateMenuWithAI, type MenuRequest } from "./menu-ai";
 import { AppError, ExitCode } from "./errors";
 
@@ -40,7 +41,6 @@ function parseArgs(argv: string[]): MenuRequest {
       if (typeof value !== "string" || value.startsWith("--")) {
         throw new AppError(`Valor ausente para --${flagName}.`, ExitCode.Usage, "INVALID_ARGUMENT");
       }
-
       index += 1;
     }
 
@@ -48,8 +48,7 @@ function parseArgs(argv: string[]): MenuRequest {
       throw new AppError(`Valor ausente para --${flagName}.`, ExitCode.Usage, "INVALID_ARGUMENT");
     }
 
-    const resolvedValue: string = value;
-    flags.set(flagName, resolvedValue);
+    flags.set(flagName, value);
   }
 
   const ordered = ["students", "days", "calories", "protein"];
@@ -86,29 +85,17 @@ function parseArgs(argv: string[]): MenuRequest {
 }
 
 async function main(): Promise<void> {
-  let request: MenuRequest;
-
   try {
-    request = parseArgs(process.argv.slice(2));
-  } catch (error) {
-    if (error instanceof AppError) {
-      console.error(error.message);
-      printUsage();
-      process.exitCode = error.exitCode;
-      return;
-    }
-
-    throw error;
-  }
-
-  try {
+    const request = parseArgs(process.argv.slice(2));
     const result = await generateMenuWithAI(request);
 
-    console.log("CARDAPIO GERADO COM IA");
+    console.log("CARDAPIO GERADO LOCALMENTE");
     console.log("=".repeat(28));
     console.log(`Alunos: ${result.request.students}`);
     console.log(`Dias: ${result.request.days}`);
-    console.log(`Meta por aluno: ${formatNumber(result.request.calories)} kcal e ${formatNumber(result.request.protein)} g de proteina`);
+    console.log(
+      `Meta por aluno: ${formatNumber(result.request.calories)} kcal e ${formatNumber(result.request.protein)} g de proteina`,
+    );
     console.log(`Regiao: ${result.pricing.region} (fator ${formatNumber(result.pricing.multiplier)})`);
     console.log(`Modelo: ${result.model}`);
 
@@ -116,7 +103,6 @@ async function main(): Promise<void> {
     result.menu.forEach((item, index) => {
       const kcal = item.food.calories * (item.grams / 100);
       const protein = item.food.protein * (item.grams / 100);
-
       console.log(
         `${index + 1}. ${item.food.name}: ${item.grams} g/aluno | ` +
           `${formatNumber(kcal)} kcal | ${formatNumber(protein)} g prot`,
@@ -145,14 +131,16 @@ async function main(): Promise<void> {
   } catch (error) {
     if (error instanceof AppError) {
       console.error(error.message);
+      printUsage();
       process.exitCode = error.exitCode;
       return;
     }
-
-    const message = error instanceof Error ? error.message : "Falha inesperada.";
-    console.error(message);
-    process.exitCode = ExitCode.Software;
+    throw error;
   }
 }
 
-void main();
+void main().catch((error) => {
+  const message = error instanceof Error ? error.message : "Erro inesperado.";
+  console.error(message);
+  process.exitCode = ExitCode.Software;
+});

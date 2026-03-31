@@ -1,3 +1,4 @@
+require("dotenv").config();
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import { generateMenuWithAI, type MenuRequest } from "./menu-ai";
 import { AppError, ExitCode } from "./errors";

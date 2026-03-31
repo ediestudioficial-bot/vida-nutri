@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/web-server.ts",
-    "ai:menu": "ts-node src/cli.ts",
-    "test": "ts-node tests/run-tests.ts",
-    "typecheck": "tsc --noEmit"
+    "dev": "node ./node_modules/ts-node/dist/bin.js src/web-server.ts",
+    "ai:menu": "node ./node_modules/ts-node/dist/bin.js src/cli.ts",
+    "test": "node ./node_modules/ts-node/dist/bin.js tests/run-tests.ts",
+    "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +16,8 @@
     "@types/node": "^25.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
   }
 }

@@ -3,546 +3,436 @@ export const WEB_UI_HTML = `<!doctype html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vida-nutri | Nutrição Escolar Profissional</title>
+    <title>vida-nutri | Planejamento de Nutrição Escolar</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
       :root {
-        --bg: #f8faf9;
+        --bg: #f8fafc;
         --surface: #ffffff;
-        --surface-soft: #f0f4f2;
-        --ink: #1a2e21;
-        --muted: #5c7064;
-        --brand: #4a7c59; /* Verde Sálvia */
-        --brand-hover: #3a6347;
-        --accent: #c0841a; /* Ouro Institucional */
-        --line: #e2e8e4;
-        --ok: #2d6a4f;
-        --warn: #a67c00;
-        --danger: #9b2226;
-        --radius-lg: 20px;
-        --radius-md: 12px;
-        --radius-sm: 8px;
-        --shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-        --shadow-hover: 0 15px 45px rgba(0, 0, 0, 0.08);
+        --ink: #0f172a;
+        --muted: #64748b;
+        --brand: #10b981;
+        --brand-light: #ecfdf5;
+        --brand-dark: #059669;
+        --line: #f1f5f9;
+        --line-dark: #e2e8f0;
+        --accent: #f59e0b;
+        --radius-sm: 6px;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
       }
 
-      * {
-        box-sizing: border-box;
-        -webkit-font-smoothing: antialiased;
-      }
+      * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
       body {
         margin: 0;
         color: var(--ink);
         font-family: 'Inter', sans-serif;
         background: var(--bg);
-        line-height: 1.5;
-        min-height: 100vh;
+        line-height: 1.6;
+        font-size: 14px;
       }
 
-      h1, h2, h3 {
-        font-family: 'Playfair Display', serif;
-        margin: 0;
-      }
-
-      .app-shell {
-        display: grid;
-        grid-template-rows: auto 1fr;
-        min-height: 100vh;
-      }
-
-      header.top-bar {
+      /* Layout */
+      header {
         background: var(--surface);
-        border-bottom: 1px solid var(--line);
-        padding: 0 5%;
+        border-bottom: 1px solid var(--line-dark);
         height: 72px;
         display: flex;
         align-items: center;
+        padding: 0 6%;
         justify-content: space-between;
         position: sticky;
         top: 0;
         z-index: 100;
+        box-shadow: var(--shadow-sm);
       }
 
-      .logo-area {
+      .logo {
+        font-weight: 800;
+        font-size: 1.6rem;
+        color: var(--brand-dark);
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
+        letter-spacing: -0.04em;
+        position: relative;
       }
-
-      .logo-icon {
-        width: 32px;
-        height: 32px;
+      .logo::before {
+        content: "";
+        width: 12px;
+        height: 12px;
         background: var(--brand);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
+        border-radius: 3px;
+        display: inline-block;
       }
 
-      .logo-text {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--brand);
-      }
-
-      nav.main-nav {
-        display: flex;
-        gap: 8px;
-      }
-
+      nav { display: flex; gap: 8px; }
       .nav-link {
-        padding: 8px 16px;
-        border-radius: var(--radius-sm);
+        padding: 10px 20px;
+        border-radius: var(--radius);
         text-decoration: none;
         color: var(--muted);
-        font-weight: 500;
+        font-weight: 600;
         font-size: 0.95rem;
-        transition: all 0.2s;
-        cursor: pointer;
         border: none;
         background: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
       }
+      .nav-link.active { color: var(--brand-dark); background: var(--brand-light); }
+      .nav-link:hover:not(.active) { color: var(--ink); background: var(--line); }
 
-      .nav-link:hover {
-        background: var(--surface-soft);
-        color: var(--brand);
-      }
-
-      .nav-link.active {
-        background: var(--surface-soft);
-        color: var(--brand);
-        font-weight: 600;
-      }
-
-      main.container {
-        max-width: 1100px;
-        margin: 32px auto;
+      main {
+        max-width: 1280px;
+        margin: 48px auto;
         padding: 0 24px;
-        width: 100%;
       }
 
-      /* Sections Visibility */
-      .page-section {
-        display: none;
-        animation: fadeIn 0.3s ease-out;
-      }
-      .page-section.active {
-        display: block;
+      .page-section { display: none; }
+      .page-section.active { display: block; }
+
+      /* Columns */
+      .grid-layout {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 40px;
+        align-items: start;
+        min-width: 0;
       }
 
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      /* Step Wizard Styling */
-      .wizard-card {
+      .col-left {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
         background: var(--surface);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
         padding: 40px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--line-dark);
+      }
+      .col-right {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      /* Visual Blocks */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line-dark);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        box-shadow: var(--shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .card:hover {
+        box-shadow: var(--shadow-md);
+      }
+
+      .card-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--ink);
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .main-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--ink);
+        margin: 0 0 12px;
+        letter-spacing: -0.05em;
+        line-height: 1.1;
+      }
+
+      .main-subtitle {
+        font-size: 1.1rem;
+        color: var(--muted);
+        margin: 0 0 32px;
+        font-weight: 400;
+        max-width: 500px;
+      }
+
+      .form-section {
+        margin-bottom: 32px;
+        padding: 24px;
+        background: #fcfdfe;
+        border-radius: var(--radius);
         border: 1px solid var(--line);
       }
-
-      .step-header {
-        margin-bottom: 32px;
-        text-align: center;
+      
+      .form-section-label {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--brand-dark);
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .form-section-label::before {
+        content: "";
+        width: 4px;
+        height: 16px;
+        background: var(--brand);
+        border-radius: 2px;
       }
 
-      .step-title {
-        font-size: 1.8rem;
-        color: var(--ink);
-        margin-bottom: 8px;
-      }
-
-      .step-desc {
-        color: var(--muted);
-        font-size: 1rem;
-      }
-
-      .step-body {
-        max-width: 600px;
-        margin: 0 auto;
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 0;
       }
 
       .input-group {
-        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 20px;
       }
-
-      .input-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
+      .input-group:last-child { margin-bottom: 0; }
 
       label {
-        display: block;
-        margin-bottom: 8px;
         font-weight: 600;
         font-size: 0.9rem;
         color: var(--ink);
       }
 
-      input, select, textarea {
-        width: 100%;
-        padding: 14px 16px;
-        border-radius: var(--radius-md);
-        border: 1.5px solid var(--line);
-        background: #fdfdfd;
+      input, select {
+        padding: 12px 16px;
+        border: 1.5px solid var(--line-dark);
+        border-radius: var(--radius-sm);
         font-family: inherit;
-        font-size: 1rem;
-        transition: all 0.2s;
+        font-size: 0.95rem;
+        width: 100%;
+        background: white;
+        transition: all 0.2s ease;
+        color: var(--ink);
       }
 
-      input:focus, select:focus, textarea:focus {
+      input:focus, select:focus {
         outline: none;
         border-color: var(--brand);
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.1);
-      }
-
-      .card-options {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-        margin-bottom: 32px;
-      }
-
-      .option-card {
-        border: 2px solid var(--line);
-        border-radius: var(--radius-md);
-        padding: 24px;
+        box-shadow: 0 0 0 4px var(--brand-light);
+      }      .btn-primary {
+        background: var(--brand-dark);
+        color: #fff;
+        border: none;
+        padding: 16px 36px;
+        width: auto;
+        min-width: 240px;
+        align-self: flex-start;
+        font-weight: 700;
+        font-size: 1.05rem;
+        border-radius: var(--radius);
         cursor: pointer;
-        transition: all 0.2s;
-        text-align: center;
-        background: var(--surface);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+        margin-top: 12px;
+      }
+      .btn-primary:hover {
+        background: #047857;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px -5px rgba(16, 185, 129, 0.3);
+      }
+      .btn-primary:active {
+        transform: translateY(0);
       }
 
-      .option-card:hover {
+      /* Summary List */
+      .summary-list { display: flex; flex-direction: column; gap: 8px; }
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        transition: border-color 0.2s ease;
+      }
+      .summary-label {
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+      .summary-value {
+        font-weight: 700;
+        color: var(--brand-dark);
+        font-size: 1rem;
+      }
+
+      /* History List */
+      .history-mini { display: flex; flex-direction: column; gap: 10px; }
+      .history-mini-item {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        cursor: pointer;
+        background: white;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .history-mini-item:hover {
         border-color: var(--brand);
-        background: var(--surface-soft);
+        background: white;
+        box-shadow: var(--shadow);
+        transform: translateY(-2px);
       }
-
-      .option-card.selected {
-        border-color: var(--brand);
-        background: rgba(74, 124, 89, 0.05);
-        box-shadow: 0 8px 20px rgba(74, 124, 89, 0.1);
-      }
-
-      .option-icon {
-        font-size: 2rem;
-        margin-bottom: 12px;
-        display: block;
-      }
-
-      .option-title {
+      .history-mini-name {
         font-weight: 700;
         display: block;
-        margin-bottom: 4px;
+        font-size: 0.95rem;
+        color: var(--ink);
+        margin-bottom: 6px;
       }
-
-      .option-desc {
-        font-size: 0.85rem;
+      .history-mini-date {
+        font-size: 0.8rem;
         color: var(--muted);
       }
 
-      /* Buttons */
-      .btn {
-        padding: 14px 28px;
-        border-radius: var(--radius-md);
-        border: none;
-        font-weight: 700;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
+      /* Result Area */
+      .result-view { display: none; margin-top: 20px; }
+      .result-view.active { display: block; }
+
+      .paper {
+        background: white;
+        border: 1px solid var(--line-dark);
+        padding: 80px;
+        box-shadow: var(--shadow-lg);
+        max-width: 900px;
+        margin: 0 auto 48px;
+        border-radius: 4px;
+        position: relative;
+      }
+      .paper::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 6px;
+        background: var(--brand-dark);
+        border-radius: 4px 4px 0 0;
+      }
+
+      .paper-actions {
+        display: flex;
         justify-content: center;
-        gap: 10px;
-      }
-
-      .btn-primary {
-        background: var(--brand);
-        color: white;
-        box-shadow: 0 10px 20px rgba(74, 124, 89, 0.2);
-      }
-
-      .btn-primary:hover {
-        background: var(--brand-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 15px 30px rgba(74, 124, 89, 0.3);
+        gap: 16px;
+        margin-bottom: 80px;
       }
 
       .btn-secondary {
         background: white;
-        color: var(--brand);
-        border: 2px solid var(--brand);
-      }
-
-      .btn-secondary:hover {
-        background: var(--surface-soft);
-      }
-
-      .btn-ghost {
-        background: transparent;
+        border: 1px solid var(--line-dark);
+        padding: 12px 28px;
+        font-weight: 600;
+        border-radius: var(--radius);
+        cursor: pointer;
         color: var(--muted);
+        transition: all 0.2s ease;
       }
-
-      .btn-ghost:hover {
-        color: var(--brand);
-      }
-
-      .wizard-actions {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 40px;
-        border-top: 1px solid var(--line);
-        padding-top: 32px;
-      }
-
-      /* Multi-step logic */
-      .step-pane {
-        display: none;
-      }
-      .step-pane.active {
-        display: block;
-      }
-
-      /* Result Area - The "A4" Document */
-      .result-view {
-        display: grid;
-        grid-template-columns: 1fr 300px;
-        gap: 32px;
-        align-items: start;
-      }
-
-      .document-paper {
-        background: #fff;
-        padding: 40px;
-        border-radius: 4px; /* Simula papel */
-        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-        min-height: 800px;
-        border: 1px solid var(--line);
-      }
-
-      .doc-actions-card {
-        position: sticky;
-        top: 104px;
-        background: var(--surface);
-        border-radius: var(--radius-lg);
-        padding: 24px;
-        box-shadow: var(--shadow);
-        border: 1px solid var(--line);
-      }
-
-      .doc-actions-card h3 {
-        font-size: 1.1rem;
-        margin-bottom: 20px;
-        border-bottom: 1px solid var(--line);
-        padding-bottom: 12px;
-      }
-
-      /* History List */
-      .history-grid {
-        display: grid;
-        gap: 16px;
-      }
-
-      .history-card {
-        background: var(--surface);
-        padding: 20px;
-        border-radius: var(--radius-md);
-        border: 1px solid var(--line);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: all 0.2s;
-      }
-
-      .history-card:hover {
-        transform: translateX(5px);
-        box-shadow: var(--shadow-hover);
-        border-color: var(--brand);
-      }
-
-      .history-info h4 {
-        margin: 0 0 4px;
-        font-size: 1.1rem;
-      }
-
-      .history-info p {
-        margin: 0;
-        font-size: 0.9rem;
-        color: var(--muted);
+      .btn-secondary:hover { 
+        background: var(--bg);
+        color: var(--ink);
+        border-color: var(--muted);
       }
 
       /* Utils */
-      .status-pill {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-      }
-      .pill-ok { background: #e8f5e9; color: #2d6a4f; }
       .hidden { display: none !important; }
 
-      /* Responsive */
-      @media (max-width: 900px) {
-        .result-view { grid-template-columns: 1fr; }
-        .doc-actions-card { position: static; }
-        .input-row { grid-template-columns: 1fr; }
+      .loader {
+        position: fixed; inset: 0; background: rgba(255,255,255,0.9);
+        display: none; align-items: center; justify-content: center;
+        flex-direction: column; z-index: 1000;
+        backdrop-filter: blur(8px);
       }
-
-      /* Logo Preview in Settings */
-      .settings-logo-box {
-        background: var(--surface-soft);
-        border-radius: var(--radius-md);
-        padding: 24px;
-        text-align: center;
-        border: 2px dashed var(--line);
-      }
-      .logo-preview-img {
-        max-width: 200px;
-        max-height: 80px;
-        margin-bottom: 16px;
-      }
-
-      /* Feedback Messages */
-      .toast {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        padding: 16px 24px;
-        border-radius: var(--radius-md);
-        color: white;
-        font-weight: 600;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        z-index: 1000;
-        display: none;
-        animation: slideIn 0.3s forwards;
-      }
-      @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-      .toast-success { background: var(--ok); }
-      .toast-error { background: var(--danger); }
-
-      /* Loading Overlay */
-      .loading-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(255,255,255,0.8);
-        backdrop-filter: blur(4px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-        display: none;
-      }
-      .spinner {
-        width: 48px;
-        height: 48px;
-        border: 5px solid var(--surface-soft);
-        border-top-color: var(--brand);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin { to { transform: rotate(360deg); } }
-
-      /* Tables in Result */
-      .res-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 16px;
-        font-size: 0.9rem;
-      }
-      .res-table th, .res-table td {
-        padding: 12px;
-        border-bottom: 1px solid var(--line);
-        text-align: left;
-      }
-      .res-table th { background: var(--surface-soft); font-weight: 700; color: var(--muted); }
+      .spinner { width: 48px; height: 48px; border: 4px solid var(--brand-light); border-top: 4px solid var(--brand); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; margin-bottom: 24px; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     </style>
   </head>
   <body>
 
-    <div class="app-shell">
-      <header class="top-bar">
-        <div class="logo-area">
-          <div class="logo-icon">VN</div>
-          <div class="logo-text">vida-nutri</div>
-        </div>
-        <nav class="main-nav">
-          <button class="nav-link active" onclick="showPage('gerar')">Novo Documento</button>
-          <button class="nav-link" onclick="showPage('historico')">Histórico</button>
-          <button class="nav-link" onclick="showPage('config')">Configurações</button>
-        </nav>
-      </header>
+    <header>
+      <div class="logo">vida-nutri</div>
+      <nav>
+        <button class="nav-link active" onclick="showPage('gerar')">Novo Documento</button>
+        <button class="nav-link" onclick="showPage('historico')">Histórico</button>
+        <button class="nav-link" onclick="showPage('config')">Configurações</button>
+      </nav>
+    </header>
 
-      <main class="container">
+    <main>
+      
+      <!-- PAGE: GERAR -->
+      <div id="page-gerar" class="page-section active">
         
-        <!-- PAGE: GERAR -->
-        <section id="page-gerar" class="page-section active">
+        <div id="form-container" class="grid-layout">
           
-          <div id="wizard" class="wizard-card">
+          <div class="col-left">
+            <h1 class="main-title">Planejamento Nutricional</h1>
+            <p class="main-subtitle">Configurações para geração de documentos técnicos de nutrição escolar.</p>
 
-            <!-- STEP 2: Dados Técnicos -->
-            <div id="step-2" class="step-pane active">
-              <div class="step-header">
-                <h2 class="step-title">Público e Metas</h2>
-                <p class="step-desc">Informe a quantidade de alunos e os objetivos nutricionais.</p>
-              </div>
-              <div class="step-body">
-                <div class="input-row">
-                  <div class="input-group">
-                    <label for="generation-mode">Tipo de geração</label>
-                    <select id="generation-mode">
-                      <option value="completo" selected>Completo</option>
-                      <option value="cardapio">Cardápio</option>
-                      <option value="cautela">Cautela</option>
-                      <option value="cotacao">Solicitação de cotação</option>
-                    </select>
-                  </div>
-                  <div class="input-group">
-                    <label for="period-mode">Período</label>
-                    <select id="period-mode">
-                      <option value="semanal">Semanal</option>
-                      <option value="quinzenal">Quinzenal</option>
-                      <option value="mensal" selected>Mensal</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="input-row">
-                  <div class="input-group">
-                    <label for="students">Total de Alunos</label>
-                    <input id="students" type="number" value="100" min="1" step="1" required />
-                  </div>
-                  <div class="input-group">
-                    <label for="days">Dias Letivos</label>
-                    <input id="days" type="number" value="22" min="1" step="1" required />
-                  </div>
-                </div>
-
-                <div class="input-row">
-                  <div class="input-group">
-                    <label for="calories">Meta Calorias (kcal/dia)</label>
-                    <input id="calories" type="number" value="600" required />
-                  </div>
-                  <div class="input-group">
-                    <label for="protein">Meta Proteína (g/dia)</label>
-                    <input id="protein" type="number" value="22" required />
-                  </div>
-                </div>
-
+            <div class="form-section">
+              <span class="form-section-label">Dados Escolares</span>
+              <div class="form-row">
                 <div class="input-group">
-                  <label for="region">Região do Brasil</label>
+                  <label>Total de alunos</label>
+                  <input id="students" type="number" value="100" min="1" oninput="updateSummary()" />
+                </div>
+                <div class="input-group">
+                  <label>Dias letivos</label>
+                  <input id="days" type="number" value="22" min="1" oninput="updateSummary()" />
+                </div>
+              </div>
+
+              <span class="form-section-label">Metas Nutricionais</span>
+              <div class="form-row">
+                <div class="input-group">
+                  <label>Calorias (kcal/aluno)</label>
+                  <input id="calories" type="number" value="600" oninput="updateSummary()" />
+                </div>
+                <div class="input-group">
+                  <label>Proteína (g/aluno)</label>
+                  <input id="protein" type="number" value="22" oninput="updateSummary()" />
+                </div>
+              </div>
+
+              <span class="form-section-label">Parâmetros de Geração</span>
+              <div class="input-group" style="margin-bottom:24px;">
+                <label>Tipo de geração</label>
+                <select id="generation-mode" onchange="updateSummary()">
+                  <option value="completo" selected>Completo (Dossiê)</option>
+                  <option value="cardapio">Apenas Cardápio</option>
+                  <option value="cautela">Apenas Cautela</option>
+                  <option value="cotacao">Solicitação de Cotação</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="input-group">
+                  <label>Período</label>
+                  <select id="period-mode" onchange="updateSummary()">
+                    <option value="semanal">Semanal</option>
+                    <option value="quinzenal">Quinzenal</option>
+                    <option value="mensal" selected>Mensal</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label>Região</label>
                   <select id="region">
                     <option value="Norte">Norte</option>
                     <option value="Nordeste">Nordeste</option>
@@ -551,464 +441,291 @@ export const WEB_UI_HTML = `<!doctype html>
                     <option value="Sul">Sul</option>
                   </select>
                 </div>
+              </div>
+            </div>
 
-                <div class="wizard-actions">
-                  <span style="flex:1"></span>
-                  <button class="btn btn-primary" onclick="generateSolicitation()">Gerar solicitação</button>
+            <button class="btn-primary" onclick="generateSolicitation()">Gerar Documentação</button>
+          </div>
+
+          <div class="col-right">
+            <div class="card">
+              <div class="card-title">Resumo do Plano</div>
+              <div class="summary-list">
+                <div class="summary-item">
+                  <span class="summary-label">Tipo:</span>
+                  <span class="summary-value" id="sum-type">Completo</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Período:</span>
+                  <span class="summary-value" id="sum-period">Mensal</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Alunos:</span>
+                  <span class="summary-value" id="sum-students">100</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Dias:</span>
+                  <span class="summary-value" id="sum-days">22</span>
                 </div>
               </div>
             </div>
 
-          </div>
-
-          <!-- RESULT VIEW -->
-          <div id="result-container" class="result-view hidden">
-            <div class="document-paper" id="paper-preview">
-              <!-- Content injected by JS -->
-              <div style="text-align:center; padding: 100px 0; color: var(--muted)">
-                Gerando visualização prévia...
-              </div>
-            </div>
-            
-            <div class="doc-actions-card">
-              <h3>Ações do Documento</h3>
-              <div style="display:grid; gap: 12px;">
-                <button class="btn btn-primary" id="print-btn" style="width:100%">Imprimir agora</button>
-                <button class="btn btn-secondary" id="download-pdf-btn" style="width:100%">Salvar PDF</button>
-                <button class="btn btn-ghost" id="new-version-btn" style="width:100%">Criar nova versão</button>
-                <button class="btn btn-ghost" id="new-doc-btn" style="width:100%; margin-top: 12px; border-top: 1px solid var(--line); border-radius: 0; padding-top: 20px;">Novo documento</button>
+            <div class="card">
+              <div class="card-title">Últimos documentos</div>
+              <div id="quick-history" class="history-mini">
+                <!-- Injected via JS -->
               </div>
             </div>
           </div>
 
-        </section>
+        </div>
 
-        <!-- PAGE: HISTÓRICO -->
-        <section id="page-historico" class="page-section">
-          <div class="step-header" style="text-align:left">
-            <h2 class="step-title">Seu Acervo de Documentos</h2>
-            <p class="step-desc">Todas as solicitações geradas neste navegador.</p>
+        <div id="result-view" class="result-view">
+          <div class="paper" id="paper-preview"></div>
+          <div class="paper-actions">
+            <button class="btn-secondary" onclick="window.print()">Imprimir PDF</button>
+            <button class="btn-secondary" id="back-btn" onclick="goBack()">Voltar</button>
           </div>
-          
-          <div style="margin-bottom: 24px; display:flex; justify-content: flex-end;">
-            <button class="btn btn-ghost" id="clear-history-btn" style="color: var(--danger)">Limpar tudo</button>
-          </div>
+        </div>
 
-          <div id="history-list" class="history-grid">
-            <!-- Injected by JS -->
-          </div>
-        </section>
+      </div>
 
-        <!-- PAGE: CONFIG -->
-        <section id="page-config" class="page-section">
-          <div class="step-header" style="text-align:left">
-            <h2 class="step-title">Dados Institucionais</h2>
-            <p class="step-desc">Configure uma vez para que todos os documentos saiam com seu timbre e assinatura.</p>
-          </div>
+      <!-- PAGE: HISTORICO -->
+      <div id="page-historico" class="page-section">
+        <h1 class="main-title">Acervo de Documentos</h1>
+        <p class="main-subtitle">Acesso rápido aos últimos planejamentos gerados.</p>
+        <div id="history-full" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:20px; margin-top:24px;"></div>
+      </div>
 
-          <div class="wizard-card" style="max-width: 800px;">
-            <div class="input-row">
-              <div class="input-group">
-                <label for="institution-name">Nome da Instituição (Ex: Prefeitura de...)</label>
-                <input id="institution-name" type="text" placeholder="Ex: Secretaria de Educação de..." />
-              </div>
-              <div class="input-group">
-                <label for="school-unit">Unidade Escolar</label>
-                <input id="school-unit" type="text" placeholder="Ex: Escola Municipal..." />
-              </div>
+      <!-- PAGE: CONFIG -->
+      <div id="page-config" class="page-section">
+        <h1 class="main-title">Configurações</h1>
+        <p class="main-subtitle">Dados institucionais para o timbre dos documentos.</p>
+        
+        <div class="card" style="margin-top:32px; max-width:800px;">
+          <div class="form-row">
+            <div class="input-group">
+              <label>Nome da Instituição</label>
+              <input id="institution-name" type="text" />
             </div>
-
-            <div class="input-row">
-              <div class="input-group">
-                <label for="city-uf">Cidade/UF</label>
-                <input id="city-uf" type="text" placeholder="Ex: Manaus/AM" />
-              </div>
-              <div class="input-group">
-                <label for="period-label">Mês/Ano do Cardápio</label>
-                <input id="period-label" type="text" placeholder="Ex: Abril/2026" />
-              </div>
-            </div>
-
-            <div class="input-row">
-              <div class="input-group">
-                <label for="technical-responsible">Nutricionista (RT)</label>
-                <input id="technical-responsible" type="text" placeholder="Nome Completo" />
-              </div>
-              <div class="input-group">
-                <label for="technical-crn">Registro CRN</label>
-                <input id="technical-crn" type="text" placeholder="Ex: CRN-7 1234/P" />
-              </div>
-            </div>
-
-            <div class="input-group hidden">
-               <input id="document-number" type="hidden" />
-               <input id="logo-url" type="hidden" />
-            </div>
-
-            <div class="settings-logo-box">
-              <label>Logotipo Institucional</label>
-              <div id="logo-preview-area">
-                <img id="logo-preview-img" class="logo-preview-img hidden" src="" alt="Sua logo" />
-                <div id="logo-empty" class="step-desc" style="padding: 20px 0;">Nenhuma logo selecionada.</div>
-              </div>
-              <div style="display:flex; justify-content:center; gap: 12px; margin-top: 12px;">
-                <button class="btn btn-secondary" id="choose-logo-btn">Selecionar Imagem</button>
-                <button class="btn btn-ghost hidden" id="remove-logo-btn" style="color:var(--danger)">Remover</button>
-              </div>
-              <input id="logo-file-input" type="file" class="hidden" accept="image/*" />
-              <p class="step-desc" style="font-size:0.8rem; margin-top:10px;">Recomendado: PNG ou JPG fundo branco. Máx 3MB.</p>
+            <div class="input-group">
+              <label>Unidade Escolar</label>
+              <input id="school-unit" type="text" />
             </div>
           </div>
-        </section>
+          <div class="form-row">
+            <div class="input-group">
+              <label>Cidade/UF</label>
+              <input id="city-uf" type="text" />
+            </div>
+            <div class="input-group">
+              <label>Responsável Técnico</label>
+              <input id="technical-responsible" type="text" />
+            </div>
+          </div>
+          <div class="input-group" style="max-width:320px;">
+            <label>CRN</label>
+            <input id="technical-crn" type="text" />
+          </div>
+        </div>
+      </div>
 
-      </main>
-    </div>
+    </main>
 
-    <!-- UI Overlays -->
-    <div id="loader" class="loading-overlay">
+    <div id="loader" class="loader">
       <div class="spinner"></div>
-      <p style="margin-top: 20px; font-weight: 600; color: var(--brand)" id="loader-text">Processando Inteligência Nutricional...</p>
+      <p style="font-weight:700; color:var(--ink);">Gerando planejamento...</p>
+      <p style="color:var(--muted); font-size:0.9rem;">Solicitação pronta</p>
     </div>
-
-    <div id="toast" class="toast"></div>
 
     <script>
-      // DOM Elements
-      var studentsInput = document.getElementById("students");
-      var daysInput = document.getElementById("days");
-      var caloriesInput = document.getElementById("calories");
-      var proteinInput = document.getElementById("protein");
-      var regionInput = document.getElementById("region");
-      var periodModeInput = document.getElementById("period-mode");
-      var generationModeInput = document.getElementById("generation-mode");
+      var STORAGE_KEY = "vida_nutri_data_v4";
+      var historyData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
-      var institutionNameInput = document.getElementById("institution-name");
-      var schoolUnitInput = document.getElementById("school-unit");
-      var cityUfInput = document.getElementById("city-uf");
-      var technicalResponsibleInput = document.getElementById("technical-responsible");
-      var technicalCrnInput = document.getElementById("technical-crn");
-      var periodLabelInput = document.getElementById("period-label");
-      var documentNumberInput = document.getElementById("document-number");
-      var logoUrlInput = document.getElementById("logo-url");
-
-      var historyList = document.getElementById("history-list");
-      var resultContainer = document.getElementById("result-container");
-      var wizard = document.getElementById("wizard");
-      var paperPreview = document.getElementById("paper-preview");
-
-      var logoFileInput = document.getElementById("logo-file-input");
-      var logoPreviewImg = document.getElementById("logo-preview-img");
-      var logoEmpty = document.getElementById("logo-empty");
-      var removeLogoBtn = document.getElementById("remove-logo-btn");
-      var chooseLogoBtn = document.getElementById("choose-logo-btn");
-
-      // State
-      var currentResult = null;
-      var currentContext = null;
-      var selectedLogoDataUrl = "";
-      var STORAGE = { institutional: "vida_nutri_inst_v2", history: "vida_nutri_hist_v2" };
-
-      // --- UI NAVIGATION ---
-      function showPage(pageId) {
+      function showPage(id) {
         document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById('page-' + id).classList.add('active');
         
-        document.getElementById('page-' + pageId).classList.add('active');
-        event.target.classList.add('active');
-
-        if (pageId === 'gerar') {
-           // Reset wizard if no result
-           if (!currentResult) {
-              resultContainer.classList.add('hidden');
-              wizard.classList.remove('hidden');
-              nextStep(2);
-           }
-        }
-      }
-
-      function nextStep(n) {
-        document.querySelectorAll('.step-pane').forEach(s => s.classList.remove('active'));
-        document.getElementById('step-' + n).classList.add('active');
-      }
-
-      function prevStep(n) {
-        nextStep(n);
-      }
-
-      // --- STORAGE & HISTORY ---
-      function getHistory() {
-        try { return JSON.parse(localStorage.getItem(STORAGE.history)) || []; } catch(e) { return []; }
-      }
-      function saveHistory(h) { localStorage.setItem(STORAGE.history, JSON.stringify(h)); }
-
-      function showToast(msg, type = 'success') {
-        var t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast toast-' + type;
-        t.style.display = 'block';
-        setTimeout(() => { t.style.display = 'none'; }, 3000);
-      }
-
-      function setLoading(isLoading, text) {
-        var l = document.getElementById('loader');
-        if (text) document.getElementById('loader-text').textContent = text;
-        l.style.display = isLoading ? 'flex' : 'none';
-      }
-
-      // --- LOGIC ---
-      function formatNumber(v, d) {
-        return new Intl.NumberFormat("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
-      }
-
-      function formatDateBr(date) { return new Intl.DateTimeFormat("pt-BR").format(date); }
-
-      function generateUniqueDocumentNumber() {
-        var now = new Date();
-        var prefix = generationModeInput.value === "cautela" ? "CAU" : "PNAE";
-        return prefix + now.getFullYear() + String(now.getMonth()+1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + "-" + String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
-      }
-
-      function getInstitutionData() {
-        return {
-          institutionName: institutionNameInput.value.trim() || "Secretaria de Educação",
-          schoolUnit: schoolUnitInput.value.trim() || "Unidade Escolar",
-          cityUf: cityUfInput.value.trim() || "-",
-          technicalResponsible: technicalResponsibleInput.value.trim() || "Nutricionista Responsável",
-          technicalCrn: technicalCrnInput.value.trim() || "CRN-0000",
-          periodLabel: periodLabelInput.value.trim() || "Mês Corrente",
-          documentNumber: documentNumberInput.value || generateUniqueDocumentNumber(),
-          generatedAt: formatDateBr(new Date()),
-          logoSrc: selectedLogoDataUrl || logoUrlInput.value.trim()
-        };
-      }
-
-      async function generateSolicitation(options) {
-        setLoading(true, "A IA está planejando os melhores gêneros alimentícios...");
+        const tabs = ['gerar', 'historico', 'config'];
+        const links = document.querySelectorAll('.nav-link');
+        tabs.forEach((tab, index) => {
+          if (id === tab) links[index].classList.add('active');
+        });
         
-        var requestData = {
-          students: Number(studentsInput.value),
-          days: Number(daysInput.value),
-          calories: Number(caloriesInput.value),
-          protein: Number(proteinInput.value),
-          region: regionInput.value,
-          periodMode: periodModeInput.value,
-          generationMode: generationModeInput.value
+        if (id === 'historico') renderFullHistory();
+      }
+
+      function updateSummary() {
+        document.getElementById('sum-type').textContent = document.getElementById('generation-mode').selectedOptions[0].text;
+        document.getElementById('sum-period').textContent = document.getElementById('period-mode').selectedOptions[0].text;
+        document.getElementById('sum-students').textContent = document.getElementById('students').value;
+        document.getElementById('sum-days').textContent = document.getElementById('days').value;
+      }
+
+      function goBack() {
+        document.getElementById('form-container').classList.remove('hidden');
+        document.getElementById('result-view').classList.remove('active');
+      }
+
+      async function generateSolicitation() {
+        var loader = document.getElementById('loader');
+        loader.style.display = 'flex';
+
+        var payload = {
+          students: Number(document.getElementById('students').value),
+          days: Number(document.getElementById('days').value),
+          calories: Number(document.getElementById('calories').value),
+          protein: Number(document.getElementById('protein').value),
+          region: document.getElementById('region').value,
+          periodMode: document.getElementById('period-mode').value,
+          generationMode: document.getElementById('generation-mode').value
         };
 
         try {
           var response = await fetch("/api/generate", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestData)
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
           });
-          var body = await response.json();
-          if(!body.ok) throw body.error;
-
-          var data = body.data;
-          var inst = getInstitutionData();
-          var rootNumber = options?.rootDocumentNumber || inst.documentNumber;
-          var version = options?.version || 1;
-
-          var record = {
-            id: Date.now() + Math.random().toString(36).substr(2, 5),
-            rootDocumentNumber: rootNumber,
-            version: version,
-            createdAtLabel: new Date().toLocaleString('pt-BR'),
-            requestData: requestData,
-            institutionData: inst,
-            resultData: data
-          };
-
-          currentResult = data;
-          currentContext = record;
-          
-          var h = getHistory();
-          h.push(record);
-          saveHistory(h);
-
-          renderDocumentPreview(record);
-          wizard.classList.add('hidden');
-          resultContainer.classList.remove('hidden');
-          showToast("Documento pronto com sucesso!");
-        } catch (e) {
-          showToast(e.message || "Erro na geração", "error");
+          var res = await response.json();
+          if (res.ok) {
+            renderPaper(res.data);
+            saveToHistory(res.data);
+            document.getElementById('form-container').classList.add('hidden');
+            document.getElementById('result-view').classList.add('active');
+          } else {
+            alert("Erro: " + res.error.message);
+          }
+        } catch(e) {
+          alert("Erro de conexão.");
         } finally {
-          setLoading(false);
+          loader.style.display = 'none';
         }
       }
 
-      function escapeHtml(v) { return String(v).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
-
-      function renderDocumentPreview(record) {
-        var data = record.resultData;
-        var inst = record.institutionData;
-
-        var menuHtml = "";
-        if (data.institutional?.weeks) {
-           data.institutional.weeks.forEach(w => {
-              w.days.forEach(d => {
-                 menuHtml += \`<tr><td>Semana \${w.weekNumber}</td><td>\${d.weekdayLabel}</td><td>\${d.preparation}</td><td>\${formatNumber(d.totals.totalCalories, 0)} kcal</td></tr>\`;
-              });
-           });
-        }
-
-        var listHtml = "";
-        var items = data.institutional?.cautela?.rows || data.purchaseList.items;
-        items.forEach(i => {
-           var qty = i.quantidadeConsolidada || i.totalKg;
-           listHtml += \`<tr><td>\${i.genero || i.name}</td><td>\${formatNumber(qty, 2)} kg</td><td>R$ \${formatNumber(i.estimativaTotal || i.totalCost, 2)}</td></tr>\`;
-        });
-
-        paperPreview.innerHTML = \`
-          <div style="display:flex; justify-content:space-between; align-items:start; border-bottom: 2px solid var(--brand); padding-bottom: 20px; margin-bottom: 20px;">
-            <div>
-               <h1 style="font-size:1.5rem; color:var(--brand)">\${inst.institutionName}</h1>
-               <p style="margin:0; font-size:0.9rem; color:var(--muted)">\${inst.schoolUnit} • \${inst.cityUf}</p>
-            </div>
-            \${inst.logoSrc ? \`<img src="\${inst.logoSrc}" style="max-height:60px">\` : '<div class="logo-icon">🌿</div>'}
-          </div>
-          <div style="margin-bottom: 30px;">
-             <h2 style="font-size:1.2rem; margin-bottom: 10px; text-transform:uppercase">Solicitação de Cotação PNAE</h2>
-             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem; background: var(--surface-soft); padding: 15px; border-radius: 8px;">
-                <div><b>Documento:</b> \${record.rootDocumentNumber} (v\${record.version})</div>
-                <div><b>Data:</b> \${inst.generatedAt}</div>
-                <div><b>Responsável:</b> \${inst.technicalResponsible}</div>
-                <div><b>CRN:</b> \${inst.technicalCrn}</div>
-                <div><b>Período:</b> \${inst.periodLabel}</div>
-                <div><b>Alunos:</b> \${data.request.students}</div>
-             </div>
-          </div>
-          
-          <h3 style="font-size:1rem; margin-top:20px;">Planejamento Alimentar</h3>
-          <table class="res-table">
-            <thead><tr><th>Período</th><th>Dia</th><th>Preparação</th><th>Meta</th></tr></thead>
-            <tbody>\${menuHtml}</tbody>
-          </table>
-
-          <h3 style="font-size:1rem; margin-top:30px;">Estimativa de Gêneros Alimentícios</h3>
-          <table class="res-table">
-            <thead><tr><th>Item</th><th>Quantidade</th><th>Subtotal Est.</th></tr></thead>
-            <tbody>\${listHtml}</tbody>
-          </table>
-
-          <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); text-align:right">
-             <p style="font-size:1.1rem; font-weight:700">Total Estimado: R$ \${formatNumber(data.purchaseList.grandTotalCost, 2)}</p>
-          </div>
-        \`;
+      function saveToHistory(data) {
+        var entry = {
+          id: Date.now(),
+          title: "Plano " + (document.getElementById('generation-mode').selectedOptions[0].text),
+          students: data.request.students,
+          date: new Date().toLocaleString('pt-BR'),
+          data: data
+        };
+        historyData.unshift(entry);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(historyData.slice(0, 50)));
+        renderQuickHistory();
       }
 
-      function renderHistory() {
-        var h = getHistory().sort((a,b) => b.id - a.id);
-        historyList.innerHTML = h.length ? "" : "<p class='step-desc'>Nenhum documento encontrado.</p>";
-        h.forEach(item => {
-           var card = document.createElement('div');
-           card.className = 'history-card';
-           card.innerHTML = \`
-            <div class="history-info">
-              <h4>\${item.rootDocumentNumber} <span class="status-pill pill-ok">v\${item.version}</span></h4>
-              <p>\${item.institutionData.schoolUnit} • \${item.institutionData.periodLabel}</p>
-              <p style="font-size:0.75rem">\${item.createdAtLabel}</p>
+      function renderQuickHistory() {
+        var container = document.getElementById('quick-history');
+        container.innerHTML = historyData.slice(0, 3).map(item => \`
+          <div class="history-mini-item" onclick="viewHistoryItem(\${item.id})">
+            <span class="history-mini-name">\${item.title}</span>
+            <span class="history-mini-date">\${item.date}</span>
+          </div>
+        \`).join("") || '<p style="color:var(--muted); font-size:0.8rem; padding: 10px;">Vazio</p>';
+      }
+
+      function renderFullHistory() {
+        var container = document.getElementById('history-full');
+        container.innerHTML = historyData.map(item => \`
+          <div class="card" style="display:flex; flex-direction: column; cursor:pointer;" onclick="viewHistoryItem(\${item.id})">
+            <div style="flex: 1;">
+              <span style="font-weight:700; font-size:1.1rem; color: var(--ink);">\${item.title}</span>
+              <p style="margin:8px 0 0; font-size:0.85rem; color:var(--muted);">\${item.date}</p>
             </div>
-            <div style="display:flex; gap: 8px;">
-               <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.8rem" onclick="viewHistoryItem('\${item.id}')">Visualizar</button>
-            </div>
-           \`;
-           historyList.appendChild(card);
-        });
+            <button class="btn-secondary" style="margin-top:20px; width:100%;">Visualizar</button>
+          </div>
+        \`).join("") || '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">Nenhum documento gerado ainda.</p>';
       }
 
       function viewHistoryItem(id) {
-         var item = getHistory().find(i => i.id === id);
-         if(item) {
-            currentResult = item.resultData;
-            currentContext = item;
-            renderDocumentPreview(item);
-            showPage('gerar');
-            wizard.classList.add('hidden');
-            resultContainer.classList.remove('hidden');
-         }
+        var item = historyData.find(h => h.id === id);
+        if (item) {
+          renderPaper(item.data);
+          document.getElementById('form-container').classList.add('hidden');
+          document.getElementById('result-view').classList.add('active');
+          showPage('gerar');
+        }
       }
 
-      // --- SETUP & EVENTS ---
-      document.getElementById('new-doc-btn').onclick = () => {
-         currentResult = null;
-         resultContainer.classList.add('hidden');
-         wizard.classList.remove('hidden');
-         nextStep(2);
-      };
+      function renderPaper(data) {
+        var inst = {
+          name: document.getElementById('institution-name').value || "Instituição não configurada",
+          unit: document.getElementById('school-unit').value || "Unidade não configurada",
+          city: document.getElementById('city-uf').value || "-",
+          rt: document.getElementById('technical-responsible').value || "Nutricionista responsável",
+          crn: document.getElementById('technical-crn').value || "CRN -"
+        };
 
-      document.getElementById('print-btn').onclick = () => window.print();
-      document.getElementById('download-pdf-btn').onclick = () => window.print(); // Hint handled in generic style
+        var html = \`
+          <div style="border-bottom: 2px solid var(--brand-dark); padding-bottom: 24px; margin-bottom: 40px; display:flex; justify-content:space-between; align-items: flex-start;">
+            <div>
+              <strong style="font-size:1.3rem; color:var(--ink); display:block; margin-bottom: 4px;">\${inst.name}</strong>
+              <span style="color:var(--muted);">\${inst.unit}</span>
+            </div>
+            <div style="text-align:right">
+              <p style="margin:0; font-size:0.85rem; color:var(--muted);">Ficha gerada em:</p>
+              <p style="margin:4px 0 0; font-size:0.9rem; font-weight: 600;">\${new Date().toLocaleDateString('pt-BR')}</p>
+            </div>
+          </div>
 
-      document.getElementById('new-version-btn').onclick = () => {
-         if(!currentContext) return;
-         var nextVers = getHistory().filter(i => i.rootDocumentNumber === currentContext.rootDocumentNumber).length + 1;
-         generateSolicitation({ rootDocumentNumber: currentContext.rootDocumentNumber, version: nextVers });
-      };
+          <h2 style="text-align:center; font-size:1.5rem; margin-bottom:40px; color:var(--ink); letter-spacing: 0.5px;">RELATÓRIO DE PLANEJAMENTO NUTRICIONAL</h2>
+          
+          <table style="width:100%; border-collapse:collapse; margin-bottom:40px;">
+            <thead>
+              <tr style="background:#f8fafc; color: var(--ink);">
+                <th style="padding:14px; border:1px solid #e2e8f0; text-align:left; font-size: 0.9rem;">ALIMENTO</th>
+                <th style="padding:14px; border:1px solid #e2e8f0; text-align:right; font-size: 0.9rem;">TOTAL (KG)</th>
+                <th style="padding:14px; border:1px solid #e2e8f0; text-align:right; font-size: 0.9rem;">CUSTO ESTIMADO</th>
+              </tr>
+            </thead>
+            <tbody>
+              \${data.purchaseList.items.map(i => \`
+                <tr>
+                  <td style="padding:12px 14px; border:1px solid #e2e8f0; color:var(--ink); font-weight: 500;">\${i.name}</td>
+                  <td style="padding:12px 14px; border:1px solid #e2e8f0; text-align:right; font-family: monospace;">\${i.totalKg.toFixed(2).replace('.', ',')}</td>
+                  <td style="padding:12px 14px; border:1px solid #e2e8f0; text-align:right; font-family: monospace;">R$ \${i.totalCost.toFixed(2).replace('.', ',')}</td>
+                </tr>
+              \`).join("")}
+            </tbody>
+            <tfoot>
+              <tr style="background: #f8fafc; font-weight:800; color: var(--brand-dark);">
+                <td colspan="2" style="padding:16px 14px; border:1px solid #e2e8f0; text-align: right; text-transform: uppercase; font-size: 0.85rem;">Total Geral Estimado</td>
+                <td style="padding:16px 14px; border:1px solid #e2e8f0; text-align:right; font-size: 1.1rem;">R$ \${data.purchaseList.grandTotalCost.toFixed(2).replace('.', ',')}</td>
+              </tr>
+            </tfoot>
+          </table>
 
-      document.getElementById('clear-history-btn').onclick = () => {
-         if(confirm("Deseja apagar todos os documentos?")) {
-            saveHistory([]);
-            renderHistory();
-            showToast("Histórico limpo.");
-         }
-      };
+          <div style="margin-top:80px; display:flex; justify-content:space-between; text-align:center;">
+            <div style="flex: 1;">
+              <div style="border-top:1px solid #cbd5e1; width:220px; margin:24px auto 8px;"></div>
+              <p style="font-size:0.9rem; font-weight:700; color:var(--ink); margin:0;">\${inst.rt}</p>
+              <p style="font-size:0.8rem; color:var(--muted); margin:4px 0 0;">\${inst.crn}</p>
+            </div>
+            <div style="flex: 1;">
+               <div style="border-top:1px solid #cbd5e1; width:220px; margin:24px auto 8px;"></div>
+               <p style="font-size:0.9rem; font-weight:700; color:var(--ink); margin:0;">Responsável Institucional</p>
+               <p style="font-size:0.8rem; color:var(--muted); margin:4px 0 0;">\${inst.city}</p>
+            </div>
+          </div>
+        \`;
+        document.getElementById('paper-preview').innerHTML = html;
+      }
 
-      // --- LOGO HANDLING ---
-      chooseLogoBtn.onclick = () => logoFileInput.click();
-      logoFileInput.onchange = (e) => {
-         var file = e.target.files[0];
-         if(!file) return;
-         var reader = new FileReader();
-         reader.onload = (re) => {
-            selectedLogoDataUrl = re.target.result;
-            logoPreviewImg.src = selectedLogoDataUrl;
-            logoPreviewImg.classList.remove('hidden');
-            logoEmpty.classList.add('hidden');
-            removeLogoBtn.classList.remove('hidden');
-            localStorage.setItem(STORAGE.institutional, JSON.stringify(getInstitutionData()));
-         };
-         reader.readAsDataURL(file);
-      };
-
-      removeLogoBtn.onclick = () => {
-         selectedLogoDataUrl = "";
-         logoPreviewImg.classList.add('hidden');
-         logoEmpty.classList.remove('hidden');
-         removeLogoBtn.classList.add('hidden');
-         localStorage.setItem(STORAGE.institutional, JSON.stringify(getInstitutionData()));
-      };
-
-      // Auto-save institutional data
-      ['institution-name', 'school-unit', 'city-uf', 'technical-responsible', 'technical-crn', 'period-label'].forEach(id => {
-         document.getElementById(id).addEventListener('input', () => {
-            localStorage.setItem(STORAGE.institutional, JSON.stringify(getInstitutionData()));
-         });
+      // Settings load/save
+      var configFields = ['institution-name', 'school-unit', 'city-uf', 'technical-responsible', 'technical-crn'];
+      configFields.forEach(id => {
+        var el = document.getElementById(id);
+        el.value = localStorage.getItem('cfg_' + id) || "";
+        el.onchange = () => localStorage.setItem('cfg_' + id, el.value);
       });
 
-      function init() {
-         var saved = localStorage.getItem(STORAGE.institutional);
-         if(saved) {
-            var d = JSON.parse(saved);
-            institutionNameInput.value = d.institutionName || "";
-            schoolUnitInput.value = d.schoolUnit || "";
-            cityUfInput.value = d.cityUf || "";
-            technicalResponsibleInput.value = d.technicalResponsible || "";
-            technicalCrnInput.value = d.technicalCrn || "";
-            periodLabelInput.value = d.periodLabel || "";
-            if(d.logoSrc) {
-               selectedLogoDataUrl = d.logoSrc;
-               logoPreviewImg.src = d.logoSrc;
-               logoPreviewImg.classList.remove('hidden');
-               logoEmpty.classList.add('hidden');
-               removeLogoBtn.classList.remove('hidden');
-            }
-         }
-         renderHistory();
-      }
-
-      init();
+      renderQuickHistory();
+      updateSummary();
     </script>
   </body>
 </html>
 `;
+
