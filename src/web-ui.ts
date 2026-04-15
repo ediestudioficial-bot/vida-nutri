@@ -351,6 +351,16 @@ export const WEB_UI_HTML = `<!doctype html>
         border-color: var(--muted);
       }
 
+      .btn-small {
+        background: var(--brand-dark);
+        color: #fff;
+        border: none;
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        cursor: pointer;
+      }
+
       /* Utils */
       .hidden { display: none !important; }
 
@@ -476,6 +486,34 @@ export const WEB_UI_HTML = `<!doctype html>
                 <!-- Injected via JS -->
               </div>
             </div>
+
+            <div class="card">
+              <div class="card-title">Conta</div>
+              <div class="input-group">
+                <label>Email</label>
+                <input id="auth-email" type="email" placeholder="voce@email.com" />
+              </div>
+              <div class="input-group">
+                <label>Senha</label>
+                <input id="auth-password" type="password" placeholder="********" />
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn-small" onclick="signUp()">Criar conta</button>
+                <button class="btn-small" onclick="signIn()">Entrar</button>
+                <button class="btn-secondary" onclick="signOut()">Sair</button>
+              </div>
+              <p id="auth-status" style="margin:14px 0 0; color:var(--muted); font-size:0.85rem;">Sessão: não autenticado</p>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Planos</div>
+              <p style="margin:0 0 14px; color:var(--muted); font-size:0.9rem;">Assinatura recorrente via Stripe.</p>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn-secondary" onclick="startCheckout('essencial')">Assinar Essencial</button>
+                <button class="btn-secondary" onclick="startCheckout('profissional')">Assinar Profissional</button>
+                <button class="btn-secondary" onclick="startCheckout('institucional')">Assinar Institucional</button>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -541,6 +579,9 @@ export const WEB_UI_HTML = `<!doctype html>
     <script>
       var STORAGE_KEY = "vida_nutri_data_v4";
       var historyData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      var AUTH_TOKEN_KEY = "vida_nutri_access_token";
+      var accessToken = localStorage.getItem(AUTH_TOKEN_KEY) || "";
+      var appConfig = null;
 
       function showPage(id) {
         document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
@@ -569,6 +610,11 @@ export const WEB_UI_HTML = `<!doctype html>
       }
 
       async function generateSolicitation() {
+        if (!accessToken) {
+          alert("Entre com sua conta para gerar documentos.");
+          return;
+        }
+
         var loader = document.getElementById('loader');
         loader.style.display = 'flex';
 
@@ -585,7 +631,10 @@ export const WEB_UI_HTML = `<!doctype html>
         try {
           var response = await fetch("/api/generate", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + accessToken
+            },
             body: JSON.stringify(payload)
           });
           var res = await response.json();
@@ -724,6 +773,116 @@ export const WEB_UI_HTML = `<!doctype html>
 
       renderQuickHistory();
       updateSummary();
+
+      async function loadConfig() {
+        try {
+          var response = await fetch("/api/config");
+          var res = await response.json();
+          if (res.ok) {
+            appConfig = res.data;
+          }
+        } catch (e) {
+          appConfig = null;
+        }
+      }
+
+      function updateAuthStatus(text) {
+        var el = document.getElementById('auth-status');
+        if (el) {
+          el.textContent = text;
+        }
+      }
+
+      function getAuthPayload() {
+        return {
+          email: String(document.getElementById('auth-email').value || "").trim(),
+          password: String(document.getElementById('auth-password').value || "")
+        };
+      }
+
+      async function signUp() {
+        var payload = getAuthPayload();
+        if (!payload.email || !payload.password) {
+          alert("Preencha email e senha.");
+          return;
+        }
+
+        var response = await fetch("/api/auth/sign-up", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+        var res = await response.json();
+        if (!res.ok) {
+          alert("Erro: " + res.error.message);
+          return;
+        }
+
+        if (res.data.session && res.data.session.accessToken) {
+          accessToken = res.data.session.accessToken;
+          localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
+          updateAuthStatus("Sessão ativa: " + payload.email);
+          return;
+        }
+        updateAuthStatus("Conta criada. Verifique seu email para confirmação.");
+      }
+
+      async function signIn() {
+        var payload = getAuthPayload();
+        if (!payload.email || !payload.password) {
+          alert("Preencha email e senha.");
+          return;
+        }
+        var response = await fetch("/api/auth/sign-in", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+        var res = await response.json();
+        if (!res.ok) {
+          alert("Erro: " + res.error.message);
+          return;
+        }
+        accessToken = res.data.session.accessToken;
+        localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
+        updateAuthStatus("Sessão ativa: " + payload.email);
+      }
+
+      function signOut() {
+        accessToken = "";
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        updateAuthStatus("Sessão: não autenticado");
+      }
+
+      async function startCheckout(plan) {
+        if (!accessToken) {
+          alert("Entre com sua conta antes de assinar.");
+          return;
+        }
+        var response = await fetch("/api/billing/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + accessToken
+          },
+          body: JSON.stringify({ plan: plan })
+        });
+        var res = await response.json();
+        if (!res.ok) {
+          alert("Erro: " + res.error.message);
+          return;
+        }
+        if (!res.data.checkoutUrl) {
+          alert("Checkout não disponível.");
+          return;
+        }
+        window.location.href = res.data.checkoutUrl;
+      }
+
+      if (accessToken) {
+        updateAuthStatus("Sessão ativa.");
+      }
+      void loadConfig();
     </script>
   </body>
 </html>

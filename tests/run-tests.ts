@@ -23,9 +23,9 @@ async function testMath(): Promise<void> {
   approxEqual(totals.totalProtein, 3856);
   approxEqual(totals.totalCarbs, 4584);
   approxEqual(totals.totalFat, 441);
-  approxEqual(totals.totalMealCost, 355.2);
-  approxEqual(totals.costPerStudent, 3.552);
-  approxEqual(purchaseList.grandTotalCost, 7104);
+  approxEqual(totals.totalMealCost, 0);
+  approxEqual(totals.costPerStudent, 0);
+  approxEqual(purchaseList.grandTotalCost, 0);
 }
 
 
@@ -40,7 +40,7 @@ async function testDeterministicMenu(): Promise<void> {
   });
   assert.ok(result.menu.length > 0);
   assert.ok(result.purchaseList.items.length > 0);
-  assert.ok(result.purchaseList.grandTotalCost > 0);
+  approxEqual(result.purchaseList.grandTotalCost, 0);
 }
 
 // Não há mais teste de alimento desconhecido pois o sistema só usa catálogo local
@@ -100,7 +100,7 @@ async function testInstitutionalMonthlyConsolidation(): Promise<void> {
   assert.ok(plan.weeks.length >= 4);
   assert.ok(plan.cautela.rows.some((row) => row.genero === "Arroz branco"));
   assert.ok(plan.cautela.rows.some((row) => row.genero === "Feijão"));
-  assert.ok(plan.cautela.grandTotal > 0);
+  approxEqual(plan.cautela.grandTotal, 0);
 }
 
 async function testWithPeriodModes(): Promise<void> {

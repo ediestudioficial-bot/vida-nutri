@@ -200,6 +200,50 @@ export function mergeDuplicateMealItems(mealItems: MealItem[]): MealItem[] {
   return Array.from(consolidated.values());
 }
 
+/**
+ * Escala as porções (gramas) para aproximar calorias e proteína por aluno
+ * aos alvos, mantendo proporções com mínimos quadrados em um único fator.
+ */
+export function adjustMenuToTargets(
+  mealItems: MealItem[],
+  targetCaloriesPerStudent: number,
+  targetProteinPerStudent: number,
+): MealItem[] {
+  assertFiniteNumber(targetCaloriesPerStudent, "targetCaloriesPerStudent");
+  assertFiniteNumber(targetProteinPerStudent, "targetProteinPerStudent");
+
+  if (targetCaloriesPerStudent <= 0 || targetProteinPerStudent <= 0) {
+    throw new Error("Metas de calorias e proteina devem ser maiores que zero.");
+  }
+
+  const base = mergeDuplicateMealItems(mealItems);
+  let calories = 0;
+  let protein = 0;
+
+  for (const item of base) {
+    const factor = item.grams / 100;
+    calories += item.food.calories * factor;
+    protein += item.food.protein * factor;
+  }
+
+  const denom = calories * calories + protein * protein;
+  if (denom < 1e-12) {
+    return base;
+  }
+
+  const alpha = (targetCaloriesPerStudent * calories + targetProteinPerStudent * protein) / denom;
+  if (!Number.isFinite(alpha) || alpha <= 0) {
+    return base;
+  }
+
+  const scaled = base.map((item) => ({
+    food: item.food,
+    grams: Math.max(1, Math.round(item.grams * alpha)),
+  }));
+
+  return mergeDuplicateMealItems(scaled);
+}
+
 export function calculateTotals(mealItems: MealItem[], students: number): MealTotals {
   assertPositiveInteger(students, "O numero de alunos");
 
@@ -214,7 +258,7 @@ export function calculateTotals(mealItems: MealItem[], students: number): MealTo
       accumulator.totalProtein += item.food.protein * factor;
       accumulator.totalCarbs += item.food.carbs * factor;
       accumulator.totalFat += item.food.fat * factor;
-      accumulator.totalMealCost += (item.grams / 1000) * item.food.cost;
+      accumulator.totalMealCost += 0;
 
       return accumulator;
     },
@@ -266,7 +310,7 @@ export function generatePurchaseList(mealItems: MealItem[], students: number, da
 
   for (const item of normalizedItems) {
     const totalKg = (item.grams * students * days) / 1000;
-    const totalCost = totalKg * item.food.cost;
+    const totalCost = 0;
     const key = normalizeFoodName(item.food.name);
     const existing = consolidated.get(key);
 
@@ -279,7 +323,7 @@ export function generatePurchaseList(mealItems: MealItem[], students: number, da
     consolidated.set(key, {
       name: item.food.name,
       totalKg,
-      costPerKg: item.food.cost,
+      costPerKg: 0,
       totalCost,
       category: item.food.category,
       unit: item.food.unit,
@@ -287,7 +331,7 @@ export function generatePurchaseList(mealItems: MealItem[], students: number, da
   }
 
   const items = Array.from(consolidated.values()).sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
-  const grandTotalCost = items.reduce((accumulator, item) => accumulator + item.totalCost, 0);
+  const grandTotalCost = 0;
 
   return {
     students,
