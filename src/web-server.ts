@@ -21,6 +21,21 @@ type SuccessResponse = {
 
 type PlanKey = "essencial" | "profissional" | "institucional";
 
+interface UserSubscription {
+  stripeCustomerId: string;
+  subscriptionStatus:
+    | "trialing"
+    | "active"
+    | "canceled"
+    | "past_due"
+    | "unpaid"
+    | "incomplete";
+  plan?: string;
+  updatedAt: string;
+}
+
+const userSubscriptions = new Map<string, UserSubscription>();
+
 const publicAppConfig = {
   authEnabled: Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY),
   billingEnabled: Boolean(process.env.STRIPE_SECRET_KEY),
@@ -95,6 +110,16 @@ async function requireUser(request: IncomingMessage): Promise<{ id: string; emai
     id: data.user.id,
     ...(data.user.email ? { email: data.user.email } : {}),
   };
+}
+
+function requireActiveSubscription(userId: string): void {
+  const sub = userSubscriptions.get(userId);
+  if (!sub) {
+    throw new AppError("Sem assinatura. Assine um plano.", ExitCode.Usage, "NO_SUBSCRIPTION");
+  }
+  if (!["trialing", "active"].includes(sub.subscriptionStatus)) {
+    throw new AppError(`Acesso negado. Status: ${sub.subscriptionStatus}`, ExitCode.Usage, "SUBSCRIPTION_INACTIVE");
+  }
 }
 
 function parseRequestBody(request: IncomingMessage): Promise<unknown> {
@@ -176,7 +201,8 @@ async function handleGenerate(
   response: ServerResponse,
 ): Promise<void> {
   try {
-    await requireUser(request);
+    const user = await requireUser(request);
+    requireActiveSubscription(user.id);
     const body = await parseRequestBody(request);
     const menuRequest = toMenuRequest(body);
     const data = await generateMenuWithAI(menuRequest);
@@ -342,6 +368,13 @@ async function handleCreateCheckoutSession(request: IncomingMessage, response: S
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       ...(user.email ? { customer_email: user.email } : {}),
+      subscription_data: {
+        trial_period_days: 7,
+        metadata: {
+          userId: user.id,
+          plan,
+        },
+      },
       success_url: `${baseUrl}/?checkout=success`,
       cancel_url: `${baseUrl}/?checkout=cancel`,
       metadata: {
@@ -362,6 +395,126 @@ async function handleCreateCheckoutSession(request: IncomingMessage, response: S
     sendJson(response, 500, {
       ok: false,
       error: { kind: "UNEXPECTED_ERROR", message: error instanceof Error ? error.message : "Erro interno." },
+    });
+  }
+}
+
+function readRawBody(request: IncomingMessage): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let totalBytes = 0;
+    request.on("data", (chunk: Buffer) => {
+      totalBytes += chunk.length;
+      if (totalBytes > 2_000_000) {
+        reject(new Error("Payload muito grande."));
+        request.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    request.on("end", () => {
+      resolve(Buffer.concat(chunks));
+    });
+    request.on("error", reject);
+  });
+}
+
+async function handleWebhook(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!stripe) {
+    sendJson(response, 503, {
+      ok: false,
+      error: { kind: "BILLING_NOT_CONFIGURED", message: "Stripe nao configurado." },
+    });
+    return;
+  }
+
+  let rawBody: Buffer;
+  try {
+    rawBody = await readRawBody(request);
+  } catch {
+    sendJson(response, 400, {
+      ok: false,
+      error: { kind: "WEBHOOK_READ_ERROR", message: "Falha ao ler corpo da requisicao." },
+    });
+    return;
+  }
+
+  let event: Stripe.Event;
+  try {
+    const ws = process.env.STRIPE_WEBHOOK_SECRET;
+    const sig = request.headers["stripe-signature"];
+    if (ws && typeof sig === "string") {
+      event = stripe.webhooks.constructEvent(rawBody, sig, ws);
+    } else {
+      event = JSON.parse(rawBody.toString("utf8")) as Stripe.Event;
+      if (!ws) {
+        console.warn("[webhook] sem STRIPE_WEBHOOK_SECRET");
+      }
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Falha na verificacao.";
+    sendJson(response, 400, {
+      ok: false,
+      error: { kind: "WEBHOOK_SIGNATURE_FAILED", message },
+    });
+    return;
+  }
+
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const userId = session.metadata?.userId;
+      const plan = session.metadata?.plan ?? "essencial";
+      const customerId =
+        typeof session.customer === "string" ? session.customer : session.customer?.id ?? null;
+      if (userId && customerId) {
+        let status: UserSubscription["subscriptionStatus"] = "trialing";
+        if (typeof session.subscription === "string") {
+          const sub = await stripe.subscriptions.retrieve(session.subscription);
+          status = sub.status as UserSubscription["subscriptionStatus"];
+        }
+        userSubscriptions.set(userId, {
+          stripeCustomerId: customerId,
+          subscriptionStatus: status,
+          plan,
+          updatedAt: new Date().toISOString(),
+        });
+        console.log(`[webhook] checkout.completed userId=${userId} status=${status}`);
+      }
+    } else if (event.type === "customer.subscription.updated") {
+      const sub = event.data.object as Stripe.Subscription;
+      const userId = sub.metadata?.userId;
+      const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+      if (userId) {
+        const existing = userSubscriptions.get(userId);
+        const planName = sub.metadata?.plan ?? existing?.plan ?? "essencial";
+        userSubscriptions.set(userId, {
+          stripeCustomerId: customerId,
+          subscriptionStatus: sub.status as UserSubscription["subscriptionStatus"],
+          plan: planName,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    } else if (event.type === "customer.subscription.deleted") {
+      const sub = event.data.object as Stripe.Subscription;
+      const userId = sub.metadata?.userId;
+      if (userId) {
+        const existing = userSubscriptions.get(userId);
+        if (existing) {
+          userSubscriptions.set(userId, {
+            ...existing,
+            subscriptionStatus: "canceled",
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      }
+    }
+    sendJson(response, 200, { ok: true, data: { received: true } });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Erro interno.";
+    sendJson(response, 500, {
+      ok: false,
+      error: { kind: "WEBHOOK_ERROR", message },
     });
   }
 }
@@ -401,6 +554,11 @@ const server = http.createServer(async (request, response) => {
 
   if (method === "POST" && path === "/api/billing/checkout") {
     await handleCreateCheckoutSession(request, response);
+    return;
+  }
+
+  if (method === "POST" && path === "/api/webhook") {
+    await handleWebhook(request, response);
     return;
   }
 
